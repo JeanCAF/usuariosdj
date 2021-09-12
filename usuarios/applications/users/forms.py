@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import authenticate
 from .models import User
 
 
@@ -53,6 +54,35 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 'placeholder': 'Contraseña'
+            }
+        )
+    )
+
+    def clean(self):
+        cleaned_data = super(LoginForm, self).clean()
+        username = self.cleaned_data['username']
+        password = self.cleaned_data['password']
+
+        if not authenticate(username=username, password=password):
+            raise forms.ValidationError('Los datos del usuario no son correctos verifique su usuario y contraseña')
+        return self.cleaned_data
+
+class UpdatePasswordForm(forms.Form):
+    password1 = forms.CharField(
+        label='Contraseña',
+        required=True,
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'Contraseña Actual'
+            }
+        )
+    )
+    password2 = forms.CharField(
+        label='Contraseña',
+        required=True,
+        widget=forms.PasswordInput(
+            attrs={
+                'placeholder': 'Contraseña Nueva'
             }
         )
     )
